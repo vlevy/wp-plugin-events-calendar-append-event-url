@@ -1,31 +1,28 @@
 <?php
 /*
-Plugin Name: Event Title Link Appender
-Description: Appends a "Link" anchor to event titles in the content that directs users to the original event listing.
-Version: 1.1
+Plugin Name: Event Title URL Appender
+Description: Appends a "Link" anchor to event titles that directs users to the original event listing.
+Version: 1.0
 Author: vlevy
 */
 
-// Hook into 'the_content' filter to modify the event content output.
-add_filter('the_content', 'append_url_to_event_title_content');
+// Hook into 'the_title' filter to modify the event title output.
+add_filter('the_title', 'append_url_to_event_title', 10, 2);
 
-function append_url_to_event_title_content($content)
+function append_url_to_event_title($title, $id)
 {
-    // Check if we're inside the main loop and if it's a single Event post of The Events Calendar plugin.
-    if (is_singular(Tribe__Events__Main::POSTTYPE) && in_the_loop() && is_main_query()) {
+    // Check if we're inside the main loop in a single Event post of The Events Calendar plugin.
+    if (is_single() && get_post_type() == Tribe__Events__Main::POSTTYPE && in_the_loop()) {
         // Retrieve the URL from the post meta.
-        $event_url = get_post_meta(get_the_ID(), '_EventURL', true);
+        $event_url = get_post_meta($id, '_EventURL', true);
 
         // Append the anchor tag to the title if the URL is not empty.
         if (!empty($event_url)) {
-            $title = get_the_title();
-            $title_with_link = $title . ' <a href="' . esc_url($event_url) . '" class="event-url-link" target="_blank">(Site)</a>';
-            // Replace the title in the content
-            $content = str_replace($title, $title_with_link, $content);
+            $title .= ' <a href="' . esc_url($event_url) . '" class="event-url-link" target="_blank">(Site)</a>';
         }
     }
 
-    return $content;
+    return $title;
 }
 
 // Add some basic styling for the link.
