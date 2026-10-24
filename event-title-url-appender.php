@@ -2,7 +2,7 @@
 /*
 Plugin Name: Event Title URL Appender
 Description: Appends a "Link" anchor to event titles that directs users to the original event listing.
-Version: 1.0
+Version: 1.0.3
 Author: vlevy
 */
 
@@ -12,13 +12,13 @@ add_filter('the_title', 'append_url_to_event_title', 10, 2);
 function append_url_to_event_title($title, $id)
 {
     // Check if we're inside the main loop in a single Event post of The Events Calendar plugin.
-    if (is_single() && get_post_type() == Tribe__Events__Main::POSTTYPE && in_the_loop()) {
+    if (!is_admin() && is_single() && (int) $id === (int) get_queried_object_id() && get_post_type($id) === "tribe_events" && in_the_loop()) {
         // Retrieve the URL from the post meta.
         $event_url = get_post_meta($id, '_EventURL', true);
 
         // Append the anchor tag to the title if the URL is not empty.
         if (!empty($event_url)) {
-            $title .= ' <a href="' . esc_url($event_url) . '" class="event-url-link" target="_blank">(Site)</a>';
+            $title .= ' <a href="' . esc_url($event_url) . '" class="event-url-link" target="_blank" rel="noopener">(Site)</a>';
         }
     }
 
